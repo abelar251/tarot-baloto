@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+*$py.class
+edge_temp/
+edge_profile/
+out.txt
+out2.txt
+out3.txt
+test_render.html
+.vscode/
+.idea/

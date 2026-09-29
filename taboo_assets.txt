@@ -1,0 +1,26 @@
+==== STYLES ====
+<style id="embedded-fonts">
+@font-face {
+  font-family: 'Cinzel';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('data:font/woff2;base64,d09GMgABAAAAAGUwABQAAAAA33wAAGTBAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGoJ8G/1YHHI/SFZBUokqBmA/U1RBVEonGgCEbC9CEQgKgaNcgYNXC4NKADDwRgE2AiQDhw4EIAWFMgeFAwwHG0rMJWxXY+qu9Nrg6N9xUjF2B7hbqDxCiXM2woKNgyDAb8P4/zMS1JAxeO2AsabLylARhMiqUQaRtGUkIJpgjLL0w+Z7FWXdMa/7xdYpad3WTFzgy4Pbwy2yEj3dxOFADqpif7CFe2yrvKpzYY+1mGEhwiFwCG4rBBfqRlzfOJzIjW7E8GmP/x0qhd7veJXh/47z2qOok87AtsXOLYs3D/H/5/etqjpJC0r3s5QMINwx/xr7gHSr2U3ftEZCGi2hJBBCS0KANEIIIQRCCQiIlK4gTWyIaAfLqdgKljvr6VULZ2kn9jv19IqlvudZ2vHX/Xk8+/6cc5HkRkXq4ULs2l9Ak84TFvS8BTALzUKDxw7UQdtcqGhsi4hlT3eI/iMWM5lQyBJaGqLv18ie+XugwkJFeCCHrCPZA69Mykc4efWGb1v/f8AqRFIQEQwsVMwZsW5Wel7X9sc6cp25u1H93kzjD7rlv5oKcOdBY4okgWASKQT8Updl6bfp+zCbG/1Ch3KzBnxPVF93L7OfitCemXC7XlHEmtINhIhOZCIDSZBULBh/mqv3zSQLeJ/YFVASKyBZ3QpbYbK5j+SKtg5RfsbDpbvshgfoFcD//M+ZN7vp3YTZmxB2tnEFi0lKEEAu0AeKyf1iaolleD++U9MLHDw5Q0No3PIB8C/KdhI3VYF9DNa
+... (truncated)
+
+==== MEANINGS ====
+const majorMeanings = {
+        0: {
+          significado: "El Loco representa los nuevos comienzos, la aventura y la fe ciega. Te invita a dar un salto a lo desconocido con optimismo.",
+          palabrasClave: "Espontaneidad, Inocencia, Viajes, Potencial, Caos fértil",
+          consejo: "Atrévete a experimentar sin planificar todo. El universo sostiene a quienes confían.",
+          advertencia: "Cuidado con la imprudencia pura y los riesgos innecesarios sin red de seguridad."
+        },
+   
+...
+
+==== LOGIC ====
+
+
+
+

@@ -1092,46 +1092,51 @@
         margin: 0;
     }
     .fan-card .card-front .marseille-art { font-size: 2.5rem; }
-  </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H" crossorigin="anonymous"></script>
-    function downloadPrediction() {
-      const btn = document.getElementById('download-btn');
-      const restartBtn = document.querySelector('#phase-result .btn-restart');
-      btn.style.display = 'none';
-      restartBtn.style.display = 'none';
-      
-      // Disable animations to prevent html2canvas from failing to render moving elements
-      const noAnimStyle = document.createElement('style');
-      noAnimStyle.innerHTML = `* { animation: none !important; transition: none !important; }`;
-      document.head.appendChild(noAnimStyle);
-      
-      // Small delay to ensure browser applies the no-animation style before capture
-      setTimeout(() => {
-          html2canvas(document.getElementById('phase-result'), {
-              backgroundColor: '#0a0a0a',
-              scale: 2,
-              useCORS: true,
-              logging: false,
-              allowTaint: true
-          }).then(canvas => {
-              const link = document.createElement('a');
-              link.download = 'tarot_baloto_prediccion.jpg';
-              link.href = canvas.toDataURL('image/jpeg', 0.9);
-              link.click();
-              
-              btn.style.display = 'inline-block';
-              restartBtn.style.display = 'inline-block';
-              document.head.removeChild(noAnimStyle);
-          }).catch(err => {
-              console.error("Error capturing image:", err);
-              btn.style.display = 'inline-block';
-              restartBtn.style.display = 'inline-block';
-              document.head.removeChild(noAnimStyle);
-          });
-      }, 100);
+    
+    /* Místicas Nuevas Mejoras */
+    .moon-phase { text-align:center; color: var(--gold-light); font-size: 0.9rem; margin-top: 10px; font-family: 'IM Fell English SC', serif; text-shadow: 0 0 5px rgba(212, 175, 55, 0.5); }
+    .life-path-info { color: #b3e5fc; font-size: 0.8rem; margin-top: 10px; font-style: italic; display: none; }
+    
+    .synchronicity-glow {
+      box-shadow: 0 0 15px 5px rgba(255, 215, 0, 0.8) !important;
+      border-color: #ffd700 !important;
+      animation: pulseGold 2s infinite;
+    }
+    
+    @keyframes pulseGold {
+      0% { box-shadow: 0 0 15px 5px rgba(255, 215, 0, 0.8); }
+      50% { box-shadow: 0 0 25px 10px rgba(255, 215, 0, 1); }
+      100% { box-shadow: 0 0 15px 5px rgba(255, 215, 0, 0.8); }
+    }
+    
+    .sync-tag {
+      position: absolute; top: -10px; right: -10px; background: #ffd700; color: #000; font-size: 0.6rem; font-weight: bold; padding: 2px 6px; border-radius: 10px; z-index: 10; font-family: 'Cinzel', serif; box-shadow: 0 0 5px #ffd700;
     }
 
-</script>
+    #ritual-screen {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(10, 10, 10, 0.95); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: var(--gold); font-family: 'Cinzel Decorative', cursive; transition: opacity 1s; opacity: 0; pointer-events: none;
+    }
+    
+    #ritual-screen.active {
+      opacity: 1; pointer-events: all;
+    }
+    
+    .breathing-orb {
+      width: 100px; height: 100px; border-radius: 50%; background: radial-gradient(circle, var(--gold-light) 0%, var(--purple) 50%, transparent 100%); animation: breathe 4s ease-in-out infinite; margin-bottom: 30px; box-shadow: 0 0 30px var(--gold);
+    }
+    
+    @keyframes breathe {
+      0%, 100% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.5); opacity: 1; }
+    }
+    
+    .reading-summary {
+      background: rgba(20, 10, 40, 0.7); border: 1px solid var(--purple-bright); border-radius: 10px; padding: 15px; margin: 20px 0; text-align: center; color: var(--silver); font-size: 0.85rem; font-family: 'IM Fell English SC', serif; line-height: 1.5;
+    }
+    
+    .reading-summary h3 { color: var(--gold); margin-bottom: 10px; font-size: 1.1rem; }
+  </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H" crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -1142,6 +1147,7 @@
   <div class="app">
     <header>
       <h1>🌙 Tarot de Marsella<br>Oráculo del Baloto</h1>
+      <div id="moon-phase" class="moon-phase"></div>
       <span class="sep"></span>
       <p>⬡ Las cartas revelan el destino de los números ⬡</p>
     </header>
@@ -1156,7 +1162,12 @@
       </p>
       <div style="text-align:center; margin-bottom: 20px;">
         <label for="birthdate" style="color:var(--gold-dark); font-family:'Cinzel Decorative', cursive; font-size: 0.9rem;">Tu Fecha de Nacimiento (Opcional): </label>
-        <input type="date" id="birthdate" style="background: rgba(0,0,0,0.5); border: 1px solid var(--gold-dark); color: var(--gold); border-radius: 5px; padding: 5px; font-family: 'IM Fell English SC', serif; margin-top: 5px;">
+        <input type="date" id="birthdate" style="background: rgba(0,0,0,0.5); border: 1px solid var(--gold-dark); color: var(--gold); border-radius: 5px; padding: 5px; font-family: 'IM Fell English SC', serif; margin-top: 5px;" onchange="updateLifePathInfo()">
+        <select id="gender" style="background: rgba(0,0,0,0.5); border: 1px solid var(--gold-dark); color: var(--gold); border-radius: 5px; padding: 5px; font-family: 'IM Fell English SC', serif; margin-left: 10px;" onchange="updateLifePathInfo()">
+           <option value="male">Masculino</option>
+           <option value="female">Femenino</option>
+        </select>
+        <div id="life-path-info" class="life-path-info"></div>
       </div>
       <div class="shuffle-btns">
         <button class="btn-shuffle" onclick="startShuffle('riffle')" id="btn-riffle">
@@ -1186,7 +1197,13 @@
         </div>
         <span id="shuffle-text">Mezclando las cartas...</span>
       </div>
-      <button id="btn-play-now" onclick="playNow()">🎴 Jugar con este Mazo</button>
+      <div style="display:flex; flex-direction:column; justify-content:center; gap: 18px; align-items:center; margin-top: 25px;">
+        <button id="btn-quick-bet" onclick="quickBet()" style="background: linear-gradient(135deg, #ffd700 0%, #d4af37 100%); color: #1a0033; font-weight: 800; border: 2px solid #fff; border-radius: 20px; font-size: 1.2rem; padding: 15px 40px; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 0 20px rgba(255, 215, 0, 0.6); text-shadow: none;">⚡ Apuesta Rápida</button>
+        <button id="btn-play-now" onclick="playNow()"  style="display: block !important; opacity: 1; pointer-events: auto; transition: opacity 0.5s, transform 0.2s, box-shadow 0.2s; background: linear-gradient(145deg, var(--purple), #160d3a); border: 1px solid var(--gold-dark); border-radius: 12px; color: var(--gold-light); font-family: 'Cinzel Decorative', cursive; font-size: 1rem; padding: 10px 20px;">🎴 Jugar Manualmente</button>
+      </div>
+      <p style="text-align:center; color: var(--gold-dark); font-size: 0.8rem; margin-top: 15px; font-family: 'IM Fell English SC', serif;">
+        <em>La <strong>Apuesta Rápida</strong> encomienda tu destino a los astros al instante:<br>baraja 3 veces y escoge las 6 cartas mágicamente por ti.</em>
+      </p>
     </div>
 
     <!-- === PHASE 2: SELECCION === -->
@@ -1202,9 +1219,15 @@
         <div class="fan-container" id="fan-container"></div>
       </div>
       <div id="selected-row"></div>
-      <button id="reveal-btn" disabled onclick="revealOracle()">🔮 Revelar el Oráculo</button>
+      <button id="reveal-btn" disabled onclick="startRitual()">🔮 Revelar el Oráculo</button>
     </div>
 
+    <!-- === MISTIC RITUAL SCREEN === -->
+    <div id="ritual-screen">
+      <div class="breathing-orb"></div>
+      <div id="ritual-text" style="font-size: 1.5rem; letter-spacing: 2px;">Cierra los ojos...</div>
+      <div id="ritual-subtext" style="font-size: 0.9rem; margin-top: 15px; color: var(--silver); font-family: 'IM Fell English SC', serif;">Respira profundo y visualiza tu intención.</div>
+    </div>
 
     <!-- === MYSTIC ORACLE SCANNER MODAL === -->
     <div id="temporal-scanner" class="hidden">
@@ -1315,6 +1338,156 @@
     const FULL_DECK = [...MAJOR, ...MINOR]; // 78 cards
 
     /* ========================================================
+       MÍSTICAS NUEVAS FUNCIONES
+       ======================================================== */
+    function getMoonPhase() {
+      const date = new Date();
+      // Un cálculo aproximado de la fase lunar
+      const lp = 2551443; 
+      const now = date.getTime() / 1000;
+      const newMoon = 947182440;
+      const phase = ((now - newMoon) % lp) / lp;
+      const phases = [
+        {name: 'Luna Nueva', icon: '🌑', msg: 'La Luna Nueva marca nuevos inicios. Planta la semilla de tu suerte.'},
+        {name: 'Luna Creciente', icon: '🌒', msg: 'La Luna Creciente multiplica tus intenciones.'},
+        {name: 'Cuarto Creciente', icon: '🌓', msg: 'El Cuarto Creciente demanda acción. Confía en tu instinto.'},
+        {name: 'Luna Gibosa Creciente', icon: '🌔', msg: 'La energía aumenta. Mantén la concentración en tu meta.'},
+        {name: 'Luna Llena', icon: '🌕', msg: 'La Luna Llena ilumina tu fortuna. Es tiempo de cosecha y culminación.'},
+        {name: 'Luna Gibosa Menguante', icon: '🌖', msg: 'Libera las dudas. Deja ir lo que no te sirve.'},
+        {name: 'Cuarto Menguante', icon: '🌗', msg: 'Cierra ciclos. La reflexión profunda afina tu oráculo.'},
+        {name: 'Luna Menguante', icon: '🌘', msg: 'Descanso energético. El silencio interior revela los números.'}
+      ];
+      const phaseIndex = Math.floor(phase * 8 + 0.5) % 8;
+      const p = phases[phaseIndex];
+      const el = document.getElementById('moon-phase');
+      if (el) {
+        el.innerHTML = `${p.icon} <strong>${p.name}</strong> — <em>${p.msg}</em>`;
+      }
+    }
+    
+    window.addEventListener('load', getMoonPhase);
+
+    function getZodiacSign(dateStr) {
+        if (!dateStr) return null;
+        const parts = dateStr.split('-');
+        if (parts.length !== 3) return null;
+        const month = parseInt(parts[1], 10);
+        const day = parseInt(parts[2], 10);
+        
+        if ((month == 1 && day <= 19) || (month == 12 && day >= 22)) return {name: "Capricornio", symbol: "♑", element: "Tierra", mult: 4};
+        if ((month == 1 && day >= 20) || (month == 2 && day <= 18)) return {name: "Acuario", symbol: "♒", element: "Aire", mult: 3};
+        if ((month == 2 && day >= 19) || (month == 3 && day <= 20)) return {name: "Piscis", symbol: "♓", element: "Agua", mult: 2};
+        if ((month == 3 && day >= 21) || (month == 4 && day <= 19)) return {name: "Aries", symbol: "♈", element: "Fuego", mult: 1};
+        if ((month == 4 && day >= 20) || (month == 5 && day <= 20)) return {name: "Tauro", symbol: "♉", element: "Tierra", mult: 4};
+        if ((month == 5 && day >= 21) || (month == 6 && day <= 20)) return {name: "Géminis", symbol: "♊", element: "Aire", mult: 3};
+        if ((month == 6 && day >= 21) || (month == 7 && day <= 22)) return {name: "Cáncer", symbol: "♋", element: "Agua", mult: 2};
+        if ((month == 7 && day >= 23) || (month == 8 && day <= 22)) return {name: "Leo", symbol: "♌", element: "Fuego", mult: 1};
+        if ((month == 8 && day >= 23) || (month == 9 && day <= 22)) return {name: "Virgo", symbol: "♍", element: "Tierra", mult: 4};
+        if ((month == 9 && day >= 23) || (month == 10 && day <= 22)) return {name: "Libra", symbol: "♎", element: "Aire", mult: 3};
+        if ((month == 10 && day >= 23) || (month == 11 && day <= 21)) return {name: "Escorpio", symbol: "♏", element: "Agua", mult: 2};
+        if ((month == 11 && day >= 22) || (month == 12 && day <= 21)) return {name: "Sagitario", symbol: "♐", element: "Fuego", mult: 1};
+        return null;
+    }
+
+    function getKuaNumber(year, gender) {
+       let sum = 0;
+       const yearStr = String(year);
+       const lastTwo = yearStr.substring(yearStr.length - 2);
+       for (let char of lastTwo) sum += parseInt(char, 10);
+       while (sum > 9) {
+           let temp = 0;
+           for (let char of String(sum)) temp += parseInt(char, 10);
+           sum = temp;
+       }
+       let kua = 0;
+       if (gender === 'male') {
+           kua = (year < 2000) ? (10 - sum) : (9 - sum);
+           if (kua === 5) kua = 2;
+       } else {
+           kua = (year < 2000) ? (5 + sum) : (6 + sum);
+           while (kua > 9) {
+               let temp = 0;
+               for (let char of String(kua)) temp += parseInt(char, 10);
+               kua = temp;
+           }
+           if (kua === 5) kua = 8;
+       }
+       if (kua <= 0) kua = 9; 
+       return kua;
+    }
+
+    function getFlyingStar() {
+        const d = new Date();
+        let sum = d.getDate() + (d.getMonth() + 1) + d.getFullYear();
+        while (sum > 9) {
+           let temp = 0;
+           for (let char of String(sum)) temp += parseInt(char, 10);
+           sum = temp;
+        }
+        return sum;
+    }
+
+    function updateLifePathInfo() {
+      const bdate = document.getElementById('birthdate').value;
+      const gender = document.getElementById('gender').value;
+      const infoEl = document.getElementById('life-path-info');
+      if (!bdate) {
+        infoEl.style.display = 'none';
+        return;
+      }
+      const cv = calcularCaminoVida(bdate);
+      const zodiac = getZodiacSign(bdate);
+      const year = parseInt(bdate.split('-')[0], 10);
+      const kua = getKuaNumber(year, gender);
+      const fStar = getFlyingStar();
+      
+      if (cv && zodiac && kua) {
+        let meaning = '';
+        if (cv===1) meaning="El Pionero: Liderazgo e independencia.";
+        else if(cv===2) meaning="El Pacificador: Cooperación y armonía.";
+        else if(cv===3) meaning="El Comunicador: Creatividad y expresión.";
+        else if(cv===4) meaning="El Constructor: Orden y estabilidad.";
+        else if(cv===5) meaning="El Aventurero: Libertad y cambio.";
+        else if(cv===6) meaning="El Sanador: Responsabilidad y amor.";
+        else if(cv===7) meaning="El Buscador: Sabiduría y análisis.";
+        else if(cv===8) meaning="El Ejecutivo: Poder material y karma.";
+        else if(cv===9) meaning="El Humanitario: Compasión y finales.";
+        else if(cv===11) meaning="El Mensajero (Maestro): Intuición suprema.";
+        else if(cv===22) meaning="El Arquitecto (Maestro): Grandes obras.";
+        else if(cv===33) meaning="El Maestro de Maestros: Amor universal.";
+        
+        infoEl.innerHTML = `
+          <div style="display:flex; align-items:center; justify-content:center; gap: 15px; margin-top: 15px;">
+            <div style="width: 70px; height: 70px; border-radius: 50%; background-image: url('zodiac_bg.png'); background-size: cover; background-position: center; border: 2px solid var(--gold); display:flex; align-items:center; justify-content:center; box-shadow: 0 0 15px var(--gold-dark);">
+               <span style="font-size: 2.5rem; color: var(--gold-light); text-shadow: 0 0 5px #000;">${zodiac.symbol}</span>
+            </div>
+            <div style="text-align: left; font-size: 0.85rem;">
+               <div style="color: var(--gold); font-size: 1rem; font-family: 'Cinzel', serif;">Signo: ${zodiac.name} (${zodiac.element})</div>
+               <div>Tu Camino de Vida es <strong>${cv}</strong>. Tu Número Feng Shui Kua es <strong>${kua}</strong>.</div>
+               <div style="color: #b3e5fc;">${meaning}</div>
+            </div>
+          </div>
+        `;
+        infoEl.style.display = 'block';
+      } else {
+        infoEl.style.display = 'none';
+      }
+    }
+
+    function startRitual() {
+      if (selectedCards.length < MAX_PICK) return;
+      document.getElementById('ritual-screen').classList.add('active');
+      setTimeout(() => {
+        document.getElementById('ritual-text').textContent = "Visualiza la fortuna...";
+      }, 2000);
+      setTimeout(() => {
+        document.getElementById('ritual-screen').classList.remove('active');
+        revealOracle();
+      }, 4000);
+    }
+
+
+    /* ========================================================
        SHUFFLE ALGORITHMS
        ======================================================== */
     function shuffleRiffle(arr) {
@@ -1418,13 +1591,46 @@
         counter.innerHTML = `Barajadas: <strong>${shuffleCount}</strong> vez${shuffleCount !== 1 ? 'es' : ''} &nbsp;·&nbsp; ${logStr}`;
 
         // Show play button on first shuffle
-        document.getElementById('btn-play-now').classList.add('visible');
+        const playBtn = document.getElementById('btn-play-now');
+        playBtn.disabled = false;
+        playBtn.style.opacity = '1';
+        playBtn.style.pointerEvents = 'auto';
+        playBtn.style.cursor = 'pointer';
+        playBtn.onmouseover = () => { playBtn.style.boxShadow = 'var(--shadow-glow)'; playBtn.style.borderColor = 'var(--gold)'; playBtn.style.transform = 'translateY(-2px)'; };
+        playBtn.onmouseout = () => { playBtn.style.boxShadow = 'none'; playBtn.style.borderColor = 'var(--gold-dark)'; playBtn.style.transform = 'translateY(0)'; };
       }, 2200);
     }
 
     function playNow() {
       document.getElementById('phase-shuffle').classList.add('hidden');
       showSelectionPhase();
+    }
+
+    function quickBet() {
+      // 1. Ocultar fase 1
+      document.getElementById('phase-shuffle').classList.add('hidden');
+      
+      // 2. Barajar automáticamente (3 veces mezclando los destinos)
+      deck = shuffleRiffle(deck);
+      deck = shuffleOverhand(deck);
+      deck = shuffleCut(deck);
+      // Invertir cartas aleatoriamente
+      deck = deck.map(card => Math.random() < 0.3 ? { ...card, reversed: !card.reversed } : card);
+      
+      // 3. Preparar fase 2 y seleccionar 6 cartas al azar
+      showSelectionPhase();
+      
+      let availableIndices = Array.from({length: deck.length}, (_, i) => i);
+      for(let i=0; i<6; i++) {
+        let randPos = Math.floor(Math.random() * availableIndices.length);
+        let pickedIdx = availableIndices.splice(randPos, 1)[0];
+        
+        let el = document.querySelector(`.fan-card[data-idx="${pickedIdx}"]`);
+        if (el) toggleCard(el, pickedIdx);
+      }
+      
+      // 4. Iniciar el ritual automáticamente
+      startRitual();
     }
 
     /* ========================================================
@@ -1564,10 +1770,35 @@
       return sum;
     }
 
-    function computeNumbers(cards, caminoVida) {
+    function calculateDailyNumerology() {
+      const d = new Date();
+      const dateStr = `${d.getDate()}${d.getMonth()+1}${d.getFullYear()}`;
+      let sum = 0;
+      for (let char of dateStr) sum += parseInt(char, 10);
+      while (sum > 9) {
+        let temp = 0;
+        for (let char of String(sum)) temp += parseInt(char, 10);
+        sum = temp;
+      }
+      return sum;
+    }
+
+    function getMirrorNumber(num, max) {
+      const str = String(num);
+      if (str.length === 2 && str[0] !== str[1]) {
+        const mirror = parseInt(str[1] + str[0], 10);
+        if (mirror > 0 && mirror <= max) return mirror;
+      }
+      return num;
+    }
+
+    function computeNumbers(cards, caminoVida, zodiac, kua, fStar) {
       // cards[0..4] = baloto, cards[5] = super balota
       let soul = cards.reduce((acc, c) => acc + c.v, 0); // semilla_alma original
       if (caminoVida) soul += (caminoVida * 9);
+      if (zodiac) soul += (zodiac.mult * 3);
+      if (kua) soul += (kua * 8); // Multiplicador de riqueza Feng Shui
+      if (fStar) soul += (fStar * 9); // Estrella de la fortuna futura
 
       const obtained = [];
       const results = [];
@@ -1575,6 +1806,17 @@
       for (let i = 0; i < 5; i++) {
         const c = cards[i];
         let base = ((c.v * 7 + i * 13 + soul) % 43) + 1;
+        let originalBase = base;
+        
+        let mirrorMsg = "";
+        if (c.reversed) {
+          const mirror = getMirrorNumber(base, 43);
+          if (mirror !== base) {
+             base = mirror;
+             mirrorMsg = ` → Inv: Espejo ${mirror}`;
+          }
+        }
+
         // Ensure no repeat and range 1-43
         let attempt = base;
         let itr = 0;
@@ -1587,17 +1829,29 @@
         results.push({
           num: attempt,
           card: c,
-          formula: `((${c.v}×7 + ${i}×13 + ${soul}) mod 43)+1 = ${base}${base !== attempt ? ` → ${attempt}` : ''}`
+          formula: `((${c.v}×7 + ${i}×13 + ${soul}) mod 43)+1 = ${originalBase}${mirrorMsg}${attempt !== base ? ` → Colisión: ${attempt}` : ''}`
         });
       }
 
       // Super Balota
       const cs = cards[5];
-      let superBase = ((cs.v * 3 + soul * 5) % 16) + 1;
+      const dailyNum = calculateDailyNumerology();
+      let superBase = ((cs.v * 3 + soul * 5 + dailyNum * 7) % 16) + 1;
+      let originalSuper = superBase;
+      let superMirrorMsg = "";
+      
+      if (cs.reversed) {
+         const mirror = getMirrorNumber(superBase, 16);
+         if (mirror !== superBase) {
+             superBase = mirror;
+             superMirrorMsg = ` → Inv: Espejo ${mirror}`;
+         }
+      }
+      
       results.push({
         num: superBase,
         card: cs,
-        formula: `((${cs.v}×3 + ${soul}×5) mod 16)+1 = ${superBase}`,
+        formula: `((${cs.v}×3 + ${soul}×5 + día:${dailyNum}×7) mod 16)+1 = ${originalSuper}${superMirrorMsg}`,
         isSuper: true
       });
 
@@ -1726,12 +1980,23 @@
 
       // Compute standard formula from cards
       const birthdateInput = document.getElementById('birthdate').value;
+      const genderInput = document.getElementById('gender') ? document.getElementById('gender').value : 'male';
       const caminoVida = calcularCaminoVida(birthdateInput);
-      const results = computeNumbers(selectedCards, caminoVida);
+      const zodiac = getZodiacSign(birthdateInput);
+      
+      let kua = null;
+      let fStar = null;
+      if (birthdateInput) {
+          const year = parseInt(birthdateInput.split('-')[0], 10);
+          kua = getKuaNumber(year, genderInput);
+          fStar = getFlyingStar();
+      }
+      
+      const results = computeNumbers(selectedCards, caminoVida, zodiac, kua, fStar);
       
       const cvText = document.getElementById('formula-cv-text');
-      if (caminoVida) {
-        cvText.innerHTML = `<em>¡Numerología Aplicada!</em> Tu Camino de Vida es <strong>${caminoVida}</strong>. Esta vibración se sumó a la semilla base.`;
+      if (caminoVida && zodiac && kua) {
+        cvText.innerHTML = `<em>¡Astrología, Numerología y Feng Shui Aplicados!</em> Tu Camino de Vida es <strong>${caminoVida}</strong>, tu energía es <strong>${zodiac.name}</strong> y tu Número Kua es <strong>${kua}</strong> (Estrella Voladora ${fStar}). Estas fuerzas se han fundido en la semilla base.`;
         cvText.style.color = '#90ee90';
       } else {
         cvText.innerHTML = `Se ha utilizado el algoritmo original puro (sin fecha de nacimiento).`;
@@ -1796,10 +2061,47 @@
       ballsContainer.style.gap = '15px';
       ballsContainer.style.marginTop = '20px';
       
+      // --- Sincronicidades ---
+      let history = JSON.parse(localStorage.getItem('tarotBalotoHistory') || '[]');
+      let historyFreq = {};
+      history.forEach(h => {
+          if (h.nums) h.nums.forEach(n => historyFreq[n] = (historyFreq[n] || 0) + 1);
+      });
+      // Guardar lectura actual
+      history.push({ date: new Date().toISOString(), nums: results.map(r => r.num) });
+      if (history.length > 20) history.shift();
+      localStorage.setItem('tarotBalotoHistory', JSON.stringify(history));
+
       results.forEach((r) => {
+        const isSync = (historyFreq[r.num] >= 1);
+        
+        let isRecent = false;
+        if(scraperSuccess) {
+            if(r.isSuper) {
+                isRecent = (r.num === principalSuper || r.num === revanchaSuper);
+            } else {
+                isRecent = principalNumbers.includes(r.num) || revanchaNumbers.includes(r.num);
+            }
+        }
+        
+        let syncClass = '';
+        let syncTag = '';
+        
+        if (isRecent) {
+            syncClass = ' recent-glow';
+            syncTag = `<div class="sync-tag" style="background:#ff3366; color:white; text-shadow:none;">¡Salió Reciente!</div>`;
+        } else if (isSync) {
+            syncClass = ' synchronicity-glow';
+            syncTag = `<div class="sync-tag">Sincronicidad</div>`;
+        }
+        
         const ball = document.createElement('div');
-        ball.className = 'number-ball' + (r.isSuper ? ' super-ball' : '');
-        ball.innerHTML = `${r.num}<span class="ball-label">${r.isSuper ? 'Super' : 'Baloto'}</span>`;
+        ball.className = 'number-ball' + (r.isSuper ? ' super-ball' : '') + syncClass;
+        if (isRecent) {
+             ball.style.boxShadow = "0 0 20px #ff3366, inset 0 0 10px #ff3366";
+             ball.style.borderColor = "#ff3366";
+        }
+        ball.innerHTML = `${syncTag}${r.num}<span class="ball-label">${r.isSuper ? 'Super' : 'Baloto'}</span>`;
         ballsContainer.appendChild(ball);
       });
       numDisp.appendChild(ballsContainer);
@@ -2179,6 +2481,23 @@
     `;
         reading.appendChild(div);
       });
+
+      // --- Resumen de Lectura ---
+      let reversedCount = results.filter(r => r.card.reversed).length;
+      let majorCount = results.filter(r => r.card.arcana === 'Mayor').length;
+      let summaryText = "";
+      if (majorCount >= 3) summaryText += "Una lectura poderosa, fuertemente influenciada por fuerzas mayores y destino kármico. ";
+      else summaryText += "Las energías menores y las decisiones cotidianas están dando forma a tu camino. ";
+      
+      if (reversedCount >= 3) summaryText += "Hay una gran cantidad de energía bloqueada o interiorizada; es vital limpiar tu aura y soltar miedos antes de jugar. ";
+      else summaryText += "Las energías fluyen de manera abierta y propicia hacia el exterior. ";
+      
+      if (caminoVida) summaryText += `Tu número de camino de vida (${caminoVida}) está anclando esta lectura a tu propósito personal. `;
+
+      const summaryDiv = document.createElement('div');
+      summaryDiv.className = 'reading-summary';
+      summaryDiv.innerHTML = `<h3>✦ El Veredicto del Oráculo ✦</h3><p>${summaryText}</p>`;
+      reading.appendChild(summaryDiv);
     }
 
     /* ========================================================
@@ -2243,7 +2562,14 @@
               allowTaint: true
           }).then(canvas => {
               const link = document.createElement('a');
-              link.download = 'tarot_baloto_prediccion.jpg';
+              const now = new Date();
+              const formattedDate = now.getFullYear() + "-" +
+                  String(now.getMonth() + 1).padStart(2, '0') + "-" +
+                  String(now.getDate()).padStart(2, '0') + "_" +
+                  String(now.getHours()).padStart(2, '0') + "-" +
+                  String(now.getMinutes()).padStart(2, '0') + "-" +
+                  String(now.getSeconds()).padStart(2, '0');
+              link.download = 'tarot_baloto_' + formattedDate + '.jpg';
               link.href = canvas.toDataURL('image/jpeg', 0.9);
               link.click();
               
@@ -2264,3 +2590,10 @@
 
 </html>
 
+
+<button onclick="window.open('/history', '_blank')" style="position: fixed; bottom: 90px; right: 20px; z-index: 9999; background: linear-gradient(135deg, #f39c12, #f1c40f); color: white; font-size: 1.2rem; font-weight: bold; border: none; padding: 15px 30px; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 15px rgba(243, 156, 18, 0.4); font-family: sans-serif;">📜 Resultados Anteriores</button>
+<button onclick="window.open('/predict', '_blank')" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; background: linear-gradient(135deg, #bc13fe, #d85cff); color: white; font-size: 1.2rem; font-weight: bold; border: none; padding: 15px 30px; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 15px rgba(188, 19, 254, 0.4); font-family: sans-serif;">🔮 Pronóstico Matemático</button>
+<a href="/taboo" style="position: fixed; bottom: 20px; left: 20px; z-index: 9999; background: radial-gradient(circle at center, #ff8c00, #8b0000); color: white; font-size: 1rem; font-weight: bold; border: 2px solid #ffcc00; padding: 10px; border-radius: 50%; width: 90px; height: 90px; cursor: pointer; box-shadow: 0 0 20px #ff4500; font-family: 'Cinzel', serif; display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+    <span style="font-size: 28px; line-height: 1;">☀️</span>
+    <span style="font-size: 0.8rem; letter-spacing: 1px; margin-top: 5px; text-shadow: 0 0 5px #000; color: #fff;">TABOO</span>
+</a>

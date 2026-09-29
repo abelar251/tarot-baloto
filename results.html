@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Matemático - Tarot Baloto</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f111a;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent: #bc13fe;
+            --accent-light: #d85cff;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --ball-main: #2dd4bf;
+            --ball-super: #f43f5e;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(188, 19, 254, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(45, 212, 191, 0.1) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, var(--accent-light), var(--ball-main));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        .card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 24px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        .card h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.3rem;
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .expert-card {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, rgba(188, 19, 254, 0.1), rgba(45, 212, 191, 0.1));
+            border-color: var(--accent);
+            text-align: center;
+            padding: 40px 24px;
+        }
+
+        .expert-card h2 {
+            justify-content: center;
+            font-size: 1.8rem;
+            color: var(--accent-light);
+        }
+
+        .balls-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .ball {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #fff;
+            background: rgba(45, 212, 191, 0.2);
+            border: 2px solid var(--ball-main);
+            box-shadow: 0 0 15px rgba(45, 212, 191, 0.3);
+        }
+
+        .ball-super {
+            background: rgba(244, 63, 94, 0.2);
+            border: 2px solid var(--ball-super);
+            box-shadow: 0 0 15px rgba(244, 63, 94, 0.4);
+        }
+        
+        .expert-card .ball {
+            width: 60px;
+            height: 60px;
+            font-size: 1.5rem;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 15px rgba(244, 63, 94, 0.4); }
+            50% { box-shadow: 0 0 25px rgba(244, 63, 94, 0.8); }
+            100% { box-shadow: 0 0 15px rgba(244, 63, 94, 0.4); }
+        }
+
+        .expert-card .ball-super {
+            animation: pulse 2s infinite;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>🔮 Dashboard Matemático</h1>
+    <div class="subtitle">Análisis predictivo de resultados históricos de Baloto</div>
+    <div style="text-align: center; margin-top: -25px; margin-bottom: 40px; color: var(--accent-light); font-weight: 600;">
+        Válido para el próximo sorteo: {{ next_date }}
+    </div>
+
+    <div class="dashboard">
+        <!-- Regresión Lineal -->
+        <div class="card">
+            <h2>📈 Regresión Lineal</h2>
+            <div class="balls-container">
+                {% for b in lin.main_balls %}
+                <div class="ball">{{ "%02d"|format(b) }}</div>
+                {% endfor %}
+                <div class="ball ball-super">{{ "%02d"|format(lin.super_ball) }}</div>
+            </div>
+        </div>
+
+        <!-- Regresión Polinómica -->
+        <div class="card">
+            <h2>🎢 Regresión Polinómica (G2)</h2>
+            <div class="balls-container">
+                {% for b in poly.main_balls %}
+                <div class="ball">{{ "%02d"|format(b) }}</div>
+                {% endfor %}
+                <div class="ball ball-super">{{ "%02d"|format(poly.super_ball) }}</div>
+            </div>
+        </div>
+
+        <!-- Análisis Frecuencial -->
+        <div class="card">
+            <h2>📊 Análisis Frecuencial Puro</h2>
+            <div class="balls-container">
+                {% for b in freq.main_balls %}
+                <div class="ball">{{ "%02d"|format(b) }}</div>
+                {% endfor %}
+                <div class="ball ball-super">{{ "%02d"|format(freq.super_ball) }}</div>
+            </div>
+        </div>
+
+        <!-- Cadenas de Markov -->
+        <div class="card">
+            <h2>🔗 Cadenas de Markov</h2>
+            <div class="balls-container">
+                {% for b in markov.main_balls %}
+                <div class="ball">{{ "%02d"|format(b) }}</div>
+                {% endfor %}
+                <div class="ball ball-super">{{ "%02d"|format(markov.super_ball) }}</div>
+            </div>
+        </div>
+
+        <!-- Random Forest -->
+        <div class="card">
+            <h2>🤖 IA: Random Forest</h2>
+            <div class="balls-container">
+                {% for b in rf.main_balls %}
+                <div class="ball">{{ "%02d"|format(b) }}</div>
+                {% endfor %}
+                <div class="ball ball-super">{{ "%02d"|format(rf.super_ball) }}</div>
+            </div>
+        </div>
+
+        <!-- Entropía Espacial -->
+        <div class="card">
+            <h2>🌌 Entropía Espacial</h2>
+            <div class="balls-container">
+                {% for b in spatial.main_balls %}
+                <div class="ball">{{ "%02d"|format(b) }}</div>
+                {% endfor %}
+                <div class="ball ball-super">{{ "%02d"|format(spatial.super_ball) }}</div>
+            </div>
+        </div>
+
+        <!-- Ciencias Exactas -->
+        <div class="card">
+            <h2>🧬 Biología: Algoritmo Genético</h2>
+            <div class="balls-container">
+                {% for b in genetic.main_balls %}
+                <div class="ball">{{ "%02d"|format(b) }}</div>
+                {% endfor %}
+                <div class="ball ball-super">{{ "%02d"|format(genetic.super_ball) }}</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>⚛️ Física: Termodinámica de Gases</h2>
+            <div class="balls-container">
+                {% for b in thermo.main_balls %}
+                <div class="ball">{{ "%02d"|format(b) }}</div>
+                {% endfor %}
+                <div class="ball ball-super">{{ "%02d"|format(thermo.super_ball) }}</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>☢️ Física Cuántica: Decaimiento Radiactivo</h2>
+            <div class="balls-container">
+                {% for b in radio.main_balls %}
+                <div class="ball">{{ "%02d"|format(b) }}</div>
+                {% endfor %}
+                <div class="ball ball-super">{{ "%02d"|format(radio.super_ball) }}</div>
+            </div>
+        </div>
+
+        <!-- Consenso Experto -->
+        <div class="card expert-card">
+            <h2>✨ Pronóstico Experto Recomendado ✨</h2>
+            <div class="balls-container">
+                {% for b in expert.main_balls %}
+                <div class="ball">{{ "%02d"|format(b) }}</div>
+                {% endfor %}
+                <div class="ball ball-super" title="Súper Balota">{{ "%02d"|format(expert.super_ball) }}</div>
+            </div>
+            <p style="margin-top: 25px; color: var(--text-muted); font-size: 0.9rem;">Los sorteos son eventos estadísticamente independientes. Juega con responsabilidad.</p>
+        </div>
+    </div>
+
+</body>
+</html>
